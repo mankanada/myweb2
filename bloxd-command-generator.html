@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloxd指令选择器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        neutral: '#1F2937',
+                        'neutral-light': '#F3F4F6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-height {
+                transition: max-height 0.3s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 标题区域 -->
+        <header class="mb-8 text-center">
+            <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-neutral mb-2 text-shadow">Bloxd指令选择器</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">快速生成//set和//replace指令，轻松选择方块类型和具体方块</p>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8 transform transition-all duration-300 hover:shadow-xl">
+            <!-- 指令类型选择 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-neutral mb-4 flex items-center">
+                    <i class="fa fa-code mr-2 text-primary"></i>选择指令类型
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative">
+                        <input type="radio" id="setCommand" name="commandType" value="set" class="peer sr-only" checked>
+                        <label for="setCommand" class="block p-4 border border-gray-200 rounded-lg cursor-pointer transition-all duration-300 hover:border-primary hover:bg-blue-50 peer-checked:border-primary peer-checked:bg-blue-50">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center mr-3 peer-checked:border-primary">
+                                    <div class="w-3 h-3 rounded-full bg-primary scale-0 peer-checked:scale-100 transition-transform duration-200"></div>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium text-neutral">//set 指令</h3>
+                                    <p class="text-sm text-gray-500">用指定方块填充区域</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <input type="radio" id="replaceCommand" name="commandType" value="replace" class="peer sr-only">
+                        <label for="replaceCommand" class="block p-4 border border-gray-200 rounded-lg cursor-pointer transition-all duration-300 hover:border-primary hover:bg-blue-50 peer-checked:border-primary peer-checked:bg-blue-50">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center mr-3 peer-checked:border-primary">
+                                    <div class="w-3 h-3 rounded-full bg-primary scale-0 peer-checked:scale-100 transition-transform duration-200"></div>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium text-neutral">//replace 指令</h3>
+                                    <p class="text-sm text-gray-500">将一种方块替换为另一种方块</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 方块选择区域 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-neutral mb-4 flex items-center">
+                    <i class="fa fa-cubes mr-2 text-primary"></i>选择方块
+                </h2>
+                
+                <!-- 分类筛选 -->
+                <div class="mb-4 overflow-x-auto scrollbar-hide">
+                    <div class="flex space-x-2 pb-2 min-w-max">
+                        <button class="category-btn px-4 py-2 bg-primary text-white rounded-full text-sm font-medium transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 active:scale-95" data-category="all">
+                            全部
+                        </button>
+                        <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95" data-category="natural">
+                            天然地形块
+                        </button>
+                        <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95" data-category="vegetation">
+                            植被块
+                        </button>
+                        <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95" data-category="ore">
+                            矿石块
+                        </button>
+                        <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-all duration-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95" data-category="crafted">
+                            人工合成块
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 方块列表 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 max-h-[400px] overflow-y-auto scrollbar-hide p-2 bg-gray-50 rounded-lg">
+                    <!-- 方块选项会通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <!-- 指令生成区域 -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-neutral mb-4 flex items-center">
+                    <i class="fa fa-magic mr-2 text-primary"></i>生成的指令
+                </h2>
+                <div class="relative">
+                    <div id="commandDisplay" class="bg-gray-800 text-white p-4 rounded-lg font-mono text-sm min-h-[60px] flex items-center">
+                        //set Dirt
+                    </div>
+                    <button id="copyButton" class="absolute right-2 top-2 bg-primary hover:bg-blue-600 text-white py-1 px-3 rounded text-xs font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 active:scale-95">
+                        <i class="fa fa-clipboard mr-1"></i>复制
+                    </button>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button id="resetButton" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95 flex items-center justify-center">
+                    <i class="fa fa-refresh mr-2"></i>重置
+                </button>
+                <button id="generateButton" class="bg-primary hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 active:scale-95 flex items-center justify-center">
+                    <i class="fa fa-check mr-2"></i>生成指令
+                </button>
+            </div>
+        </main>
+
+        <!-- 复制成功提示 -->
+        <div id="copyNotification" class="fixed bottom-6 right-6 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-500 flex items-center">
+            <i class="fa fa-check-circle mr-2"></i>
+            <span>指令已复制到剪贴板！</span>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center text-gray-500 text-sm py-4">
+            <p>© 2025 Bloxd指令选择器 | 由豆包编程助手提供支持</p>
+        </footer>
+    </div>
+
+    <script>
+        // 方块数据
+        const blocks = [
+            // 天然地形块
+            { name: "Dirt", displayName: "泥土", category: "natural" },
+            { name: "Messy_Dirt", displayName: "脏土", category: "natural" },
+            { name: "Grass_Block", displayName: "草方块", category: "natural" },
+            { name: "Sand", displayName: "沙子", category: "natural" },
+            { name: "Clay", displayName: "粘土", category: "natural" },
+            { name: "Gravel", displayName: "砾石", category: "natural" },
+            { name: "Stone", displayName: "石头", category: "natural" },
+            { name: "Diorite", displayName: "闪长岩", category: "natural" },
+            { name: "Andesite", displayName: "安山岩", category: "natural" },
+            { name: "Granite", displayName: "花岗岩", category: "natural" },
+            { name: "Coal_Ore", displayName: "煤矿石", category: "natural" },
+            { name: "Iron_Ore", displayName: "铁矿石", category: "natural" },
+            { name: "Gold_Ore", displayName: "金矿石", category: "natural" },
+            { name: "Diamond_Ore", displayName: "钻石矿石", category: "natural" },
+            { name: "Water", displayName: "水", category: "natural" },
+            { name: "Ice", displayName: "冰", category: "natural" },
+            { name: "Bedrock", displayName: "基岩", category: "natural" },
+            { name: "Moonstone_Ore", displayName: "月光石矿石", category: "natural" },
+            { name: "Red_Sand", displayName: "红沙", category: "natural" },
+            { name: "Rocky_Dirt", displayName: "岩石土", category: "natural" },
+            
+            // 植被块
+            { name: "Maple_Log", displayName: "枫木", category: "vegetation" },
+            { name: "Pine_Log", displayName: "松木", category: "vegetation" },
+            { name: "Cedar_Log", displayName: "雪松", category: "vegetation" },
+            { name: "Aspen_Log", displayName: "白杨木", category: "vegetation" },
+            { name: "Elm_Log", displayName: "榆木", category: "vegetation" },
+            { name: "Pine_Leaves", displayName: "松树叶", category: "vegetation" },
+            { name: "Aspen_Leaves", displayName: "白杨树叶", category: "vegetation" },
+            { name: "Maple_Leaves", displayName: "枫叶", category: "vegetation" },
+            { name: "Elm_Leaves", displayName: "榆树叶", category: "vegetation" },
+            { name: "Watermelon", displayName: "西瓜", category: "vegetation" },
+            { name: "Cactus", displayName: "仙人掌", category: "vegetation" },
+            { name: "Tall_Grass", displayName: "高草", category: "vegetation" },
+            { name: "Dandelion", displayName: "蒲公英", category: "vegetation" },
+            { name: "Poppy", displayName: "罂粟", category: "vegetation" },
+            { name: "Red_Tulip", displayName: "红郁金香", category: "vegetation" },
+            { name: "Pink_Tulip", displayName: "粉郁金香", category: "vegetation" },
+            { name: "White_Tulip", displayName: "白郁金香", category: "vegetation" },
+            { name: "Orange_Tulip", displayName: "橙郁金香", category: "vegetation" },
+            { name: "Daisy", displayName: "雏菊", category: "vegetation" },
+            { name: "Bluebell", displayName: "蓝铃花", category: "vegetation" },
+            { name: "Forget-Me-Not", displayName: "勿忘我", category: "vegetation" },
+            { name: "Allium", displayName: "葱属植物", category: "vegetation" },
+            { name: "Azure_Bluet", displayName: "天蓝菊", category: "vegetation" },
+            { name: "Lily_Of_The_Valley", displayName: "铃兰", category: "vegetation" },
+            { name: "Wither_Rose", displayName: "凋零玫瑰", category: "vegetation" },
+            { name: "Aspen_Sapling", displayName: "白杨树苗", category: "vegetation" },
+            { name: "Maple_Sapling", displayName: "枫树苗", category: "vegetation" },
+            { name: "Elm_Sapling", displayName: "榆树", category: "vegetation" },
+            { name: "Plum_Sapling", displayName: "李子树苗", category: "vegetation" },
+            { name: "Pine_Sapling", displayName: "松树苗", category: "vegetation" },
+            { name: "Cedar_Sapling", displayName: "雪松苗", category: "vegetation" },
+            { name: "Palm_Log", displayName: "棕榈木", category: "vegetation" },
+            { name: "Fat_Cactus", displayName: "胖仙人掌", category: "vegetation" },
+            { name: "Vines", displayName: "藤蔓", category: "vegetation" },
+            { name: "Wheat_Seeds", displayName: "小麦种子", category: "vegetation" },
+            { name: "Wheat", displayName: "小麦", category: "vegetation" },
+            { name: "Plum_Leaves", displayName: "李子树叶", category: "vegetation" },
+            { name: "Cedar_Leaves", displayName: "雪松叶", category: "vegetation" },
+            { name: "Palm_Leaves", displayName: "棕榈叶", category: "vegetation" },
+            { name: "Autumn_Maple_Leaves", displayName: "秋天枫叶", category: "vegetation" },
+            { name: "Fallen_Maple_Leaves", displayName: "落叶枫叶", category: "vegetation" },
+            { name: "Pear_Leaves", displayName: "梨树叶", category: "vegetation" },
+            { name: "Pear_Sapling", displayName: "梨树苗", category: "vegetation" },
+            { name: "Pear_Log", displayName: "梨木", category: "vegetation" },
+            { name: "Watermelon_Seeds", displayName: "西瓜种子", category: "vegetation" },
+            { name: "Attached_Watermelon_Stem", displayName: "连接的西瓜茎", category: "vegetation" },
+            { name: "Pumpkin_Seeds", displayName: "南瓜种子", category: "vegetation" },
+            { name: "Attached_Pumpkin_Stem", displayName: "连接的南瓜茎", category: "vegetation" },
+            { name: "Melon_Seeds", displayName: "甜瓜种子", category: "vegetation" },
+            { name: "Attached_Melon_Stem", displayName: "连接的甜瓜茎", category: "vegetation" },
+            { name: "Melon", displayName: "甜瓜", category: "vegetation" },
+            
+            // 矿石块
+            { name: "Coal_Ore", displayName: "煤矿石", category: "ore" },
+            { name: "Iron_Ore", displayName: "铁矿石", category: "ore" },
+            { name: "Gold_Ore", displayName: "金矿石", category: "ore" },
+            { name: "Lapis_Lazuli_Ore", displayName: "青金石矿石", category: "ore" },
+            { name: "Emerald_Ore", displayName: "绿宝石矿石", category: "ore" },
+            { name: "Diamond_Ore", displayName: "钻石矿石", category: "ore" },
+            { name: "Moonstone_Ore", displayName: "月光石矿石", category: "ore" },
+            
+            // 人工合成块
+            { name: "Crafted_1", displayName: "人工合成块1", category: "crafted" },
+            { name: "Crafted_2", displayName: "人工合成块2", category: "crafted" },
+            { name: "Crafted_3", displayName: "人工合成块3", category: "crafted" }
+        ];
+
+        // 当前选中的方块
+        let selectedFromBlock = null;
+        let selectedToBlock = null;
+
+        // DOM 元素
+        const commandTypeRadios = document.querySelectorAll('input[name="commandType"]');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const blockList = document.querySelector('.grid');
+        const commandDisplay = document.getElementById('commandDisplay');
+        const copyButton = document.getElementById('copyButton');
+        const resetButton = document.getElementById('resetButton');
+        const generateButton = document.getElementById('generateButton');
+        const copyNotification = document.getElementById('copyNotification');
+
+        // 初始化方块列表
+        function initializeBlockList() {
+            blockList.innerHTML = '';
+            blocks.forEach(block => {
+                const blockElement = document.createElement('div');
+                blockElement.className = 'block-item bg-white border border-gray-200 rounded-lg p-3 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-blue-50';
+                blockElement.dataset.name = block.name;
+                blockElement.dataset.category = block.category;
+                blockElement.innerHTML = `
+                    <div class="text-center">
+                        <div class="w-full h-12 bg-gray-100 rounded mb-2 flex items-center justify-center text-gray-400">
+                            <i class="fa fa-cube text-xl"></i>
+                        </div>
+                        <h4 class="font-medium text-neutral text-sm">${block.displayName}</h4>
+                        <p class="text-xs text-gray-500 mt-1">${block.name}</p>
+                    </div>
+                `;
+                
+                blockElement.addEventListener('click', () => {
+                    const commandType = document.querySelector('input[name="commandType"]:checked').value;
+                    
+                    // 移除所有选中状态
+                    document.querySelectorAll('.block-item').forEach(item => {
+                        item.classList.remove('border-primary', 'bg-blue-50');
+                        item.classList.add('border-gray-200');
+                    });
+                    
+                    // 添加选中状态
+                    blockElement.classList.remove('border-gray-200');
+                    blockElement.classList.add('border-primary', 'bg-blue-50');
+                    
+                    if (commandType === 'set') {
+                        selectedFromBlock = block.name;
+                        selectedToBlock = null;
+                    } else {
+                        selectedFromBlock = block.name;
+                        selectedToBlock = null;
+                        // 对于replace指令，需要选择两个方块
+                        setTimeout(() => {
+                            blockElement.classList.remove('border-primary', 'bg-blue-50');
+                            blockElement.classList.add('border-secondary', 'bg-green-50');
+                            
+                            // 提示选择第二个方块
+                            const otherBlocks = blocks.filter(b => b.name !== block.name);
+                            blockList.innerHTML = '';
+                            
+                            otherBlocks.forEach(otherBlock => {
+                                const otherBlockElement = document.createElement('div');
+                                otherBlockElement.className = 'block-item bg-white border border-gray-200 rounded-lg p-3 cursor-pointer transition-all duration-200 hover:border-secondary hover:bg-green-50';
+                                otherBlockElement.dataset.name = otherBlock.name;
+                                otherBlockElement.dataset.category = otherBlock.category;
+                                otherBlockElement.innerHTML = `
+                                    <div class="text-center">
+                                        <div class="w-full h-12 bg-gray-100 rounded mb-2 flex items-center justify-center text-gray-400">
+                                            <i class="fa fa-cube text-xl"></i>
+                                        </div>
+                                        <h4 class="font-medium text-neutral text-sm">${otherBlock.displayName}</h4>
+                                        <p class="text-xs text-gray-500 mt-1">${otherBlock.name}</p>
+                                    </div>
+                                `;
+                                
+                                otherBlockElement.addEventListener('click', () => {
+                                    // 移除所有选中状态
+                                    document.querySelectorAll('.block-item').forEach(item => {
+                                        item.classList.remove('border-secondary', 'bg-green-50');
+                                        item.classList.add('border-gray-200');
+                                    });
+                                    
+                                    // 添加选中状态
+                                    otherBlockElement.classList.remove('border-gray-200');
+                                    otherBlockElement.classList.add('border-secondary', 'bg-green-50');
+                                    
+                                    selectedToBlock = otherBlock.name;
+                                    updateCommandDisplay();
+                                    
+                                    // 2秒后恢复完整方块列表
+                                    setTimeout(() => {
+                                        initializeBlockList();
+                                        // 高亮已选的两个方块
+                                        document.querySelectorAll('.block-item').forEach(item => {
+                                            if (item.dataset.name === selectedFromBlock) {
+                                                item.classList.remove('border-gray-200');
+                                                item.classList.add('border-primary', 'bg-blue-50');
+                                            } else if (item.dataset.name === selectedToBlock) {
+                                                item.classList.remove('border-gray-200');
+                                                item.classList.add('border-secondary', 'bg-green-50');
+                                            }
+                                        });
+                                    }, 2000);
+                                });
+                                
+                                blockList.appendChild(otherBlockElement);
+                            });
+                            
+                            // 显示提示
+                            commandDisplay.textContent = `请选择要替换为的方块 (当前: 从 ${block.displayName} 替换)`;
+                        }, 500);
+                    }
+                    
+                    updateCommandDisplay();
+                });
+                
+                blockList.appendChild(blockElement);
+            });
+        }
+
+        // 更新指令显示
+        function updateCommandDisplay() {
+            const commandType = document.querySelector('input[name="commandType"]:checked').value;
+            
+            if (commandType === 'set' && selectedFromBlock) {
+                commandDisplay.textContent = `//set ${selectedFromBlock}`;
+            } else if (commandType === 'replace' && selectedFromBlock && selectedToBlock) {
+                commandDisplay.textContent = `//replace ${selectedFromBlock} ${selectedToBlock}`;
+            } else if (commandType === 'replace' && selectedFromBlock && !selectedToBlock) {
+                commandDisplay.textContent = `//replace ${selectedFromBlock} [请选择要替换为的方块]`;
+            } else {
+                commandDisplay.textContent = commandType === 'set' ? '//set [方块名称]' : '//replace [源方块] [目标方块]';
+            }
+        }
+
+        // 筛选方块
+        function filterBlocks(category) {
+            document.querySelectorAll('.block-item').forEach(block => {
+                if (category === 'all' || block.dataset.category === category) {
+                    block.style.display = 'block';
+                    // 添加淡入动画
+                    block.style.opacity = '0';
+                    setTimeout(() => {
+                        block.style.opacity = '1';
+                        block.style.transition = 'opacity 0.3s ease-in-out';
+                    }, 50);
+                } else {
+                    block.style.display = 'none';
+                }
+            });
+        }
+
+        // 复制指令到剪贴板
+        function copyCommandToClipboard() {
+            const textToCopy = commandDisplay.textContent;
+            
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    // 显示复制成功提示
+                    copyNotification.classList.remove('translate-y-20', 'opacity-0');
+                    copyNotification.classList.add('translate-y-0', 'opacity-100');
+                    
+                    // 3秒后隐藏提示
+                    setTimeout(() => {
+                        copyNotification.classList.remove('translate-y-0', 'opacity-100');
+                        copyNotification.classList.add('translate-y-20', 'opacity-0');
+                    }, 3000);
+                })
+                .catch(err => {
+                    console.error('复制失败: ', err);
+                    alert('复制失败，请手动复制。');
+                });
+        }
+
+        // 重置选择
+        function resetSelection() {
+            selectedFromBlock = null;
+            selectedToBlock = null;
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.block-item').forEach(item => {
+                item.classList.remove('border-primary', 'bg-blue-50', 'border-secondary', 'bg-green-50');
+                item.classList.add('border-gray-200');
+            });
+            
+            // 重置指令显示
+            updateCommandDisplay();
+            
+            // 重置为set指令
+            document.getElementById('setCommand').checked = true;
+            
+            // 重置分类筛选
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.dataset.category === 'all') {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('bg-primary', 'text-white');
+                } else {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+            
+            // 恢复完整方块列表
+            initializeBlockList();
+        }
+
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化方块列表
+            initializeBlockList();
+            
+            // 指令类型变更事件
+            commandTypeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    resetSelection();
+                });
+            });
+            
+            // 分类筛选事件
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有按钮的选中状态
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('bg-primary', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    
+                    // 添加当前按钮的选中状态
+                    button.classList.remove('bg-gray-200', 'text-gray-700');
+                    button.classList.add('bg-primary', 'text-white');
+                    
+                    // 筛选方块
+                    filterBlocks(button.dataset.category);
+                });
+            });
+            
+            // 复制按钮事件
+            copyButton.addEventListener('click', copyCommandToClipboard);
+            
+            // 重置按钮事件
+            resetButton.addEventListener('click', resetSelection);
+            
+            // 生成按钮事件
+            generateButton.addEventListener('click', () => {
+                if ((document.getElementById('setCommand').checked && selectedFromBlock) || 
+                    (document.getElementById('replaceCommand').checked && selectedFromBlock && selectedToBlock)) {
+                    copyCommandToClipboard();
+                } else {
+                    alert('请先选择方块！');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+    
